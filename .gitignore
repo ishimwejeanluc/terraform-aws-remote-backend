@@ -1,0 +1,15 @@
+#
+
+mdfiles
+.DS_Store
+
+# Terraform local state
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+crash.log
+
+# Local-only config
+terraform.tfvars
+backend.hcl
