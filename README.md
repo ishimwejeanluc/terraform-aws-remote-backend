@@ -26,7 +26,7 @@ Terraform
   +--> VPC -> Public Subnet -> IGW -> Route Table
                       |
                       v
-                   EC2 (t3.micro) + SG (SSH/HTTP)
+                   EC2 (t2.micro) + SG (SSH/HTTP)
 ```
 
 ## 4. Tools and Technologies Used
