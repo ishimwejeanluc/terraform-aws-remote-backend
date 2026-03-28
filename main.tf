@@ -79,37 +79,38 @@ resource "aws_route_table_association" "public" {
 
 resource "aws_security_group" "web" {
   name        = "${var.project_name}-web-sg"
-  description = "Allow SSH from a single IP and HTTP from anywhere"
+  description = "Allow SSH, HTTP, and all outbound traffic"
   vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "SSH from trusted IP"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.ssh_ingress_cidr]
-  }
-
-  ingress {
-    description = "HTTP from anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   tags = {
     Name        = "${var.project_name}-web-sg"
     Environment = var.environment
   }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh_ipv4" {
+  security_group_id = aws_security_group.web.id
+  cidr_ipv4         = var.ssh_ingress_cidr
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+  description       = "SSH from trusted IP"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_http_ipv4" {
+  security_group_id = aws_security_group.web.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+  description       = "HTTP from anywhere"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.web.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # All protocols
+  description       = "All outbound"
 }
 
 resource "aws_instance" "web" {
